@@ -1,0 +1,14 @@
+FROM python:3.8-slim
+
+WORKDIR /app
+
+COPY ./backend/requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY ./backend /app
+
+EXPOSE 5000
+
+# Flask 애플리케이션을 실행하는 CMD를 설정합니다.
+CMD ["python", "run.py"]

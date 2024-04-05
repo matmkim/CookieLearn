@@ -1,0 +1,10 @@
+FROM node:14
+WORKDIR /app
+COPY ./frontend /app
+RUN npm install
+RUN npm run build
+# nginx를 사용하여 빌드된 앱을 서빙합니다.
+FROM nginx:alpine
+COPY --from=0 /app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

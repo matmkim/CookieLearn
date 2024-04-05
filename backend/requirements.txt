@@ -1,0 +1,22 @@
+Flask==3.0.2
+langchain==0.1.14
+langchain-community==0.0.31
+langchain-core==0.1.40
+langchain-openai==0.1.1
+langchain-text-splitters==0.0.1
+langsmith==0.1.40
+numpy==1.24.4
+openai==1.16.2
+pandas==2.0.3
+tenacity==8.2.3
+tiktoken==0.6.0
+scipy==1.10.1
+sentence-transformers==2.6.1
+konlpy
+ekonlpy
+contractions Levenshtein fuzzywuzzy
+scikit-network
+pymongo
+kss
+python-mecab-kor
+--upgrade --force-reinstall ekonlpy
