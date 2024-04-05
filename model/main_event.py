@@ -9,7 +9,7 @@ topics=["한동훈_20240320_20240325","조국_20240320_20240325","이재명_2024
 graphs=[]
 
 for _ in topics:
-  with open("/content/drive/MyDrive/Media Bias ML/result/models/"+f'DoNet_{_}.p', 'rb') as f:
+  with open("./result/models/"+f'DoNet_{_}.p', 'rb') as f:
     DoNet = pickle.load(f)
   mapping={_:_.strip() for _ in list(DoNet.nx_graph.nodes())}
   nx.relabel_nodes(DoNet.nx_graph, mapping, copy=False)
@@ -30,10 +30,10 @@ event_network.build()
 
 event_network.clustering()
 event_network.embedding(dim=2)
-with open(f"/content/drive/MyDrive/Media Bias ML/result/images/event_graph_{event_network.category}_1.svg", 'wt') as file:
+with open(f"./result/images/event_graph_{event_network.category}_1.svg", 'wt') as file:
     svg_content=event_network.plot_network()
     file.write(svg_content)
-with open(f"/content/drive/MyDrive/Media Bias ML/result/images/event_graph_{event_network.category}_2.svg", 'wt') as file:
+with open(f"./result/images/event_graph_{event_network.category}_2.svg", 'wt') as file:
     svg_content=event_network.plot_embedding()
     file.write(svg_content)
-event_network.export(file_path="/content/drive/MyDrive/Media Bias ML/result")
+event_network.export(file_path="./result")
