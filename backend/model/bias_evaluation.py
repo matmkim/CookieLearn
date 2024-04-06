@@ -13,6 +13,7 @@ import pandas as pd
 from transformers import AdamW
 from transformers.optimization import get_cosine_schedule_with_warmup
 import csv
+import os
 import kss # Korean Sentence Splitter: https://github.com/likejazz/korean-sentence-splitter
 
 ###########################################################
@@ -69,13 +70,13 @@ class BiasEvaluation():
     def update_device(self, device_name = None):
         if device_name: self.device = torch.device(device_name)
         else: self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        print("Device set to : %s" % torch.cuda.get_device_name(device))
+        print("Device set to : %s" % torch.cuda.get_device_name(self.device))
         
     def load_model(self):
         print("Loading pre-trained model from : " + self.model_dir)
-        self.model = BertForSequenceClassification.from_pretrained(model_dir)
-        self.tokenizer = BertTokenizer.from_pretrained(model_dir)
-        self.model.to(device)
+        self.model = BertForSequenceClassification.from_pretrained(self.model_dir)
+        self.tokenizer = BertTokenizer.from_pretrained(self.model_dir)
+        self.model.to(self.device)
         self.model.eval()
         
     def evaluate(self, articles, verbose = False): # evaluates political bias of list of articles
@@ -114,7 +115,7 @@ class BiasEvaluation():
             if verbose: print("Evaluating the sentences...")
             evaluation = 0
             for batch in prediction_loader:
-                batch = tuple(t.to(device) for t in batch)
+                batch = tuple(t.to(self.device) for t in batch)
     
                 b_input_ids, b_input_mask = batch
     
@@ -136,7 +137,6 @@ class BiasEvaluation():
     
     def evaluate_csv(self, csv_path, out_dir, out_name, encoding = 'UTF-8', verbose = False):
         dataset = pd.read_csv(csv_path, names=['time', 'category_name', 'text_company', 'text_headline', 'text_sentence', 'content_url'], encoding = encoding).drop(0)
-        if max_len: dataset = dataset.sample(max_len)
         titles = dataset.text_headline.values
         texts = dataset.text_sentence.values
         if verbose: print("Processing %s articles from CSV file..." % len(titles))
@@ -153,6 +153,8 @@ class BiasEvaluation():
         pair_data = [['text_headline', 'text_sentence', 'bias_label']] + pair_data
         notext_data = [['time',	'category_name', 'text_company', 'text_headline', 'content_url', "bias_label"]] + notext_data
     
+        if not os.path.exists(out_dir): os.makedirs(out_dir)
+
         csv_path_1 = out_dir + out_name + "_pair_sorted.csv"
         csv_path_2 = out_dir + out_name + "_notext.csv"
         
@@ -167,5 +169,19 @@ class BiasEvaluation():
             csvfile.close()
     
         if verbose: print("Save pair data at : "+csv_path_1)
-        print("Saved notext data at : "+csv_path_2)
- 
+        if verbose:print("Saved notext data at : "+csv_path_2)
+
+
+
+
+if __name__ == '__main__':
+    main_dir = './'
+    model_dir = './model_save/model_20240404/'
+    csv_dir = './output/'
+    out_dir = '../app/analysis_result'
+
+    
+
+    bias = BiasEvaluation(main_dir, model_dir)
+    for csv_path in os.listdir(csv_dir):
+        bias.evaluate_csv(csv_dir + csv_path, out_dir, os.path.splitext(os.path.basename(csv_path))[0], encoding = 'utf-8', verbose = True)

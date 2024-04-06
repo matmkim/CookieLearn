@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from app import app
-#from app.lang_modules import langfunction
+from app.lang_modules import langfunction
 
 # 간단한 홈페이지 렌더링
 @app.route('/')
@@ -13,7 +13,7 @@ def chat():
     user_input = request.json['user_input']
     try: 
         pass
-        #bot_output = langfunction(user_input)
+        bot_output = langfunction(user_input)
     except: 
         bot_output = 'error : false input'
 
